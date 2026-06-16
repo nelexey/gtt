@@ -41,6 +41,7 @@ func configInit() {
 			"hide_below":                    false,
 			"transparent":                   false,
 			"theme":                         "gruvbox",
+			"auto_translate":                "off",
 			"source.border_color":           "red",
 			"destination.border_color":      "blue",
 			"source.language.apertium":      "English",
@@ -154,6 +155,7 @@ func configInit() {
 	uiStyle.OSC52 = config.GetBool("osc52")
 	uiStyle.HideBelow = config.GetBool("hide_below")
 	uiStyle.Transparent = config.GetBool("transparent")
+	autoTranslateDelay = config.GetString("auto_translate")
 	uiStyle.SetSrcBorderColor(config.GetString("source.border_color")).
 		SetDstBorderColor(config.GetString("destination.border_color"))
 	// Import api key and host if file exists
@@ -219,6 +221,10 @@ func updateConfig() {
 	if config.GetBool("transparent") != uiStyle.Transparent {
 		changed = true
 		config.Set("transparent", uiStyle.Transparent)
+	}
+	if config.GetString("auto_translate") != autoTranslateDelay {
+		changed = true
+		config.Set("auto_translate", autoTranslateDelay)
 	}
 	if config.GetBool("hide_below") != uiStyle.HideBelow {
 		changed = true

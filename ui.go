@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/eeeXun/gtt/internal/style"
 	"github.com/eeeXun/gtt/internal/translate"
@@ -84,6 +85,7 @@ func updateBackgroundColor() {
 		themeDropDown,
 		transparentDropDown,
 		hideBelowDropDown,
+		autoTranslateDropDown,
 		osc52DropDown,
 		srcBorderDropDown,
 		dstBorderDropDown} {
@@ -146,6 +148,7 @@ func updateNonConfigColor() {
 		themeDropDown,
 		transparentDropDown,
 		hideBelowDropDown,
+		autoTranslateDropDown,
 		osc52DropDown,
 		srcBorderDropDown,
 		dstBorderDropDown} {
@@ -276,6 +279,34 @@ func uiInit() {
 
 	// input/output
 	srcInput.SetBorder(true)
+	srcInput.SetChangedFunc(func() {
+		if autoTranslateDelay == "off" {
+			return
+		}
+		delay, err := time.ParseDuration(autoTranslateDelay)
+		if err != nil {
+			return
+		}
+
+		if autoTranslateTimer != nil {
+			autoTranslateTimer.Stop()
+		}
+		autoTranslateTimer = time.AfterFunc(delay, func() {
+			message := srcInput.GetText()
+			if len(message) > 0 {
+				translation, err := translator.Translate(message)
+				app.QueueUpdateDraw(func() {
+					if err != nil {
+						dstOutput.SetText(err.Error())
+					} else {
+						dstOutput.SetText(translation.TEXT)
+						defOutput.SetText(translation.DEF, false)
+						posOutput.SetText(translation.POS, false)
+					}
+				})
+			}
+		})
+	})
 	dstOutput.SetBorder(true)
 	defOutput.SetBorder(true).SetTitle("Definition/Example")
 	posOutput.SetBorder(true).SetTitle("Part of speech")
@@ -299,6 +330,11 @@ func uiInit() {
 		SetCurrentOption(
 			IndexOf(strconv.FormatBool(uiStyle.HideBelow),
 				[]string{"true", "false"}))
+	autoTranslateDropDown.SetLabel("Auto Translate: ").
+		SetOptions([]string{"off", "0.5s", "1s", "5s", "10s"}, nil).
+		SetCurrentOption(
+			IndexOf(autoTranslateDelay,
+				[]string{"off", "0.5s", "1s", "5s", "10s"}))
 	osc52DropDown.SetLabel("OSC 52: ").
 		SetOptions([]string{"true", "false"}, nil).
 		SetCurrentOption(
@@ -360,9 +396,10 @@ func uiInit() {
 						Item{item: themeDropDown, fixedSize: 0, proportion: 1, focus: true},
 						Item{item: transparentDropDown, fixedSize: 0, proportion: 1, focus: false},
 						Item{item: hideBelowDropDown, fixedSize: 0, proportion: 1, focus: false},
+						Item{item: autoTranslateDropDown, fixedSize: 0, proportion: 1, focus: false},
 						Item{item: osc52DropDown, fixedSize: 0, proportion: 1, focus: false}),
 						fixedSize: 0, proportion: 1, focus: true}),
-					fixedSize: 4, proportion: 1, focus: true},
+					fixedSize: 5, proportion: 1, focus: true},
 				Item{item: attachItems(false, tview.FlexColumn,
 					Item{item: srcBorderDropDown, fixedSize: 0, proportion: 1, focus: false},
 					Item{item: dstBorderDropDown, fixedSize: 0, proportion: 1, focus: false}),
@@ -434,6 +471,10 @@ func uiInit() {
 		SetSelectedFunc(func(text string, index int) {
 			uiStyle.HideBelow, _ = strconv.ParseBool(text)
 			updateTranslateWindow()
+		})
+	autoTranslateDropDown.SetDoneFunc(styleDropDownHandler).
+		SetSelectedFunc(func(text string, index int) {
+			autoTranslateDelay = text
 		})
 	osc52DropDown.SetDoneFunc(styleDropDownHandler).
 		SetSelectedFunc(func(text string, index int) {

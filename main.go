@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"time"
 
 	"github.com/eeeXun/gtt/internal/style"
 	"github.com/eeeXun/gtt/internal/translate"
@@ -22,6 +23,9 @@ var (
 	uiStyle = style.NewStyle()
 	// keyMaps
 	keyMaps = make(map[string]string)
+	// Auto Translate
+	autoTranslateDelay string
+	autoTranslateTimer *time.Timer
 	// UI
 	app                 = tview.NewApplication()
 	srcInput            = tview.NewTextArea()
@@ -35,6 +39,7 @@ var (
 	themeDropDown       = tview.NewDropDown()
 	transparentDropDown = tview.NewDropDown()
 	hideBelowDropDown   = tview.NewDropDown()
+	autoTranslateDropDown = tview.NewDropDown()
 	osc52DropDown       = tview.NewDropDown()
 	srcBorderDropDown   = tview.NewDropDown()
 	dstBorderDropDown   = tview.NewDropDown()
@@ -42,6 +47,7 @@ var (
 		themeDropDown,
 		transparentDropDown,
 		hideBelowDropDown,
+		autoTranslateDropDown,
 		osc52DropDown,
 		srcBorderDropDown,
 		dstBorderDropDown)
