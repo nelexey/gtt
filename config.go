@@ -72,14 +72,11 @@ func configInit() {
 	}
 	if len(os.Getenv("XDG_CONFIG_HOME")) > 0 {
 		defaultConfigPath = os.Getenv("XDG_CONFIG_HOME") + "/gtt"
-		for _, c := range []*viper.Viper{config, themeConfig, keyMapConfig, serverConfig} {
-			c.AddConfigPath(defaultConfigPath)
-		}
 	} else {
 		defaultConfigPath = os.Getenv("HOME") + "/.config/gtt"
 	}
 	for _, c := range []*viper.Viper{config, themeConfig, keyMapConfig, serverConfig} {
-		c.AddConfigPath("$HOME/.config/gtt")
+		c.AddConfigPath(defaultConfigPath)
 	}
 
 	// Import theme if file exists
