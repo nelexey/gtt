@@ -55,8 +55,12 @@ const (
 
 func updateTranslateWindow() {
 	if uiStyle.HideBelow {
+		translateWindow.RemoveItem(keyMapHintWidget)
 		translateWindow.RemoveItem(translateBelowWidget)
 	} else {
+		translateWindow.RemoveItem(keyMapHintWidget)
+		translateWindow.RemoveItem(translateBelowWidget)
+		translateWindow.AddItem(keyMapHintWidget, 1, 0, false)
 		translateWindow.AddItem(translateBelowWidget, 0, 1, false)
 	}
 }
@@ -360,10 +364,18 @@ func uiInit() {
 		SetBorder(true).
 		SetTitle("Key Map")
 
+	leftKeyMapHint.SetText(fmt.Sprintf(" <%s> - swap   <%s> - copy   <%s> - clear   <%s> - speech", keyMaps["swap_language"], keyMaps["copy_source"], keyMaps["clear"], keyMaps["tts_source"])).
+		SetTextColor(tcell.ColorGray)
+	rightKeyMapHint.SetText(fmt.Sprintf(" <%s> - copy   <%s> - speech", keyMaps["copy_destination"], keyMaps["tts_destination"])).
+		SetTextColor(tcell.ColorGray)
+
 	// window
 	translateAboveWidget.SetDirection(tview.FlexColumn).
 		AddItem(srcInput, 0, 1, true).
 		AddItem(dstOutput, 0, 1, false)
+	keyMapHintWidget.SetDirection(tview.FlexColumn).
+		AddItem(leftKeyMapHint, 0, 1, false).
+		AddItem(rightKeyMapHint, 0, 1, false)
 	translateBelowWidget.SetDirection(tview.FlexColumn).
 		AddItem(defOutput, 0, 1, false).
 		AddItem(posOutput, 0, 1, false)
